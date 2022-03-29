@@ -1,3 +1,5 @@
+# 강준서 식물생산과학부 2022-14673
+
 import sys
 from weather.tempconv import *
 

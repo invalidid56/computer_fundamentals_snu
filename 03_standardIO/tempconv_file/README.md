@@ -9,3 +9,5 @@ filename doesn't matter, includes fahr-temp data per line
 translater fahr temp to cellcius temp
 - fahr2cels(fahr)
 - cels2fahr(cels)
+
+#### 강준서 식물생산과학부 2022-14673

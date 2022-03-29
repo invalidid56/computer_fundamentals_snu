@@ -1,3 +1,5 @@
+# 강준서 식물생산과학부 2022-14673
+
 def fahr2cels(fahr):    # 화씨-섭씨
     """
     convert Fahrenheit to Celsius
