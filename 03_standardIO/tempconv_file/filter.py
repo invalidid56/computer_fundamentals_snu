@@ -1,4 +1,5 @@
 # 강준서 식물생산과학부 2022-14673
+# filter.py - read file, calculate and write result
 
 import sys
 from weather.tempconv import *

@@ -1,4 +1,5 @@
 # 강준서 식물생산과학부 2022-14673
+# tempconv.py: define methods for calculating
 
 def fahr2cels(fahr):    # 화씨-섭씨
     """
