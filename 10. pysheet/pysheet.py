@@ -38,7 +38,17 @@ class Dataframe:
 
     def __repr__(self):
         for row in self._rows:
-            print('\t'.join(row), end='\n')
+            print('\t'.join([str(r) for r in row]), end='\n')
+
+    def __str__(self):
+        line = ''
+        l = self.__len__()
+        for i, row in enumerate(self._rows):
+            if not i == l-1:
+                line += ('\t'.join([str(r) for r in row])+'\n')
+            else:
+                line += ('\t'.join([str(r) for r in row]))
+        return line
 
     def get_column(self, column):
         return [row[self._columns.index(column)] for row in self._rows]
@@ -63,18 +73,19 @@ class Dataframe:
                          rows=result)
 
     def colsums(self, col_range, calc='sum'):
-        cols = [self._columns[int(c)] for c in col_range.split('-')]
+        cols = [int(c)-1 for c in col_range.split('-')]
+        cols = list(range(cols[0], cols[1]+1))
         result = [0 for _ in cols]
         for row in self._rows:
-            for col in cols:
-                result[self._columns.index(col)] += row[self._columns.index(col)]
+            for i, col in enumerate(cols):
+                result[i] += row[col]
         if calc == 'sum':
             return Dataframe(columns=['Col', 'Sum'],
-                             rows=[[c, r] for c, r in zip(cols, result)])
+                             rows=[[self._columns[c], r] for c, r in zip(cols, result)])
         elif calc == 'mean':
             l = self.__len__()
             return Dataframe(columns=['Col', 'Sum'],
-                             rows=[[c, r/l] for c, r in zip(cols, result)])
+                             rows=[[self._columns[c], r/l] for c, r in zip(cols, result)])
         else:
             print('Calculation Error')
             exit()
@@ -97,7 +108,7 @@ class Dataframe:
         section = (min(col), max(col))
         interval = (section[1]-section[0])/ninterval
         breaks = [
-            (section[0]+interval*(n-1), section[0]+interval*n) for n in range(ninterval)
+            (section[0]+interval*n, section[0]+interval*(n+1)) for n in range(ninterval)
         ]
 
         def check_interval(n, sections):
@@ -118,7 +129,10 @@ class Dataframe:
         result = []
         for row in self._rows:
             for i, colname in enumerate(self._columns):
-                ex = colname + '=' + row[i]
+                if str(type(row[i])) == "<class 'str'>":
+                    ex = colname + '=' + "'" + row[i] + "'"
+                else:
+                    ex = colname + '=' + str(row[i])
                 exec(ex)
             newval = eval(expression)
             result.append(row+[newval])
@@ -129,11 +143,23 @@ class Dataframe:
 class DataframeFromFile(Dataframe):
     def __init__(self, filename):
         with open(filename, 'r') as f:
-            columns = f.readline().strip().split('\t')
-            rows = []
-            for line in f:
-                rows.append(line.strip().split('\t'))
-
+            if filename.endswith('txt'):
+                columns = f.readline().strip().split('\t')
+                rows = []
+                for line in f:
+                    rows.append(line.strip().split('\t'))
+            elif filename.endswith('tab'):
+                columns = f.readline().strip().split('\t')
+                rows = []
+                for line in f:
+                    rows.append(line.strip().split('\t'))
+            elif filename.endswith('dat'):
+                columns = [col for col in f.readline().strip().split(' ') if col]
+                rows = []
+                for line in f:
+                    rows.append(
+                        [l for l in line.strip().split(' ') if l]
+                    )
         super().__init__(columns=columns,
                          rows=rows)
 
@@ -154,8 +180,8 @@ def main(argv):
         )
         print(result)
 
-    elif func == 'colsums' or 'colmeans':
-        calc = 'sum' if argv[2]=='colsums' else 'mean'
+    elif func == 'colsums' or func == 'colmeans':
+        calc = 'sum' if argv[2] == 'colsums' else 'mean'
         col_range = argv[-3]
         filename = argv[-1]
         df = DataframeFromFile(filename)
@@ -195,7 +221,7 @@ def main(argv):
         for b, c in zip(result['breaks'], result['counts']):
             print("{0} - {1} | {2}".format(b[0], b[1], c))
 
-    elif func == 'frequency':
+    elif func == 'hist':
         ninterval = int(argv[-3])
         col = argv[-4]
         filename = argv[-1]
@@ -206,6 +232,15 @@ def main(argv):
         )
         for b, c in zip(result['breaks'], result['counts']):
             print("{0} - {1} | ".format(b[0], b[1])+('*'*c))
+
+    elif func == 'addcol':
+        exp = argv[-3]
+        filename = argv[-1]
+        df = DataframeFromFile(filename)
+        result = df.addcol(
+            expression=exp
+        )
+        print(result)
 
 
 if __name__ == '__main__':
