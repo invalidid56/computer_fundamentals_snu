@@ -1,16 +1,7 @@
-# invalidid56@snu.ac.kr 작물생태정보연구실 강준서
-#
+# invalidid56@snu.ac.kr 식물생산과학부 강준서
+# Pysheet; 데이터시트 관리 프로그램
 # pysheet <func> (<calc> <value_colname> by <group_colname>) in <filename>
 
-'''
-컬럼 이름: colnames(filename)
-부분합: subtotal(value_colname, group_colname, filename, calc='mean') 합이 필요할 때에는 calc='sum'ho
-컬럼 계산: colsums(column_range, filename, calc='sum') 평균이 필요할 때는 calc='mean'
-빈도표: table(colname, filename)
-정렬: sortby(colname, filename)
-돗수분포표: frequency(colname, ninterval, filename)
-행 계산: addcol(formula, filename)
-'''
 import sys
 
 
@@ -222,6 +213,7 @@ def main(argv):
             print("{0} - {1} | {2}".format(b[0], b[1], c))
 
     elif func == 'hist':
+        MAXLEN = 64
         ninterval = int(argv[-3])
         col = argv[-4]
         filename = argv[-1]
@@ -230,8 +222,12 @@ def main(argv):
             ninterval=ninterval,
             column=col
         )
+        MAX = max(result['counts'])
         for b, c in zip(result['breaks'], result['counts']):
-            print("{0} - {1} | ".format(b[0], b[1])+('*'*c))
+            markers = int(MAXLEN*(c/MAX))
+            if markers == 0 and not c == 0:
+                markers = 1
+            print("{0} - {1} | ".format(b[0], b[1])+('*'*markers))
 
     elif func == 'addcol':
         exp = argv[-3]
