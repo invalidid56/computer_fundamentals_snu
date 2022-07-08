@@ -1,0 +1,10 @@
+name	year	amount
+john	2006	500
+john	2007	1000
+john	2008	780
+mary	2006	70
+mary	2007	150
+mary	2008	550
+mark	2008	1700
+mark	2006	1300
+mark	2008	500
